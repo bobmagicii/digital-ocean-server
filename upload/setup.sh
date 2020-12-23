@@ -36,7 +36,7 @@ InstallOptDirectory() {
 InstallCorePackages() {
 	# install things i need just to be productive.
 	apt-get update
-	apt-get -y install joe unzip
+	apt-get -y install joe unzip mlocate
 }
 
 InstallLAMP() {
@@ -57,6 +57,9 @@ ConfigureSSH() {
 	echo "PermitRootLogin no" > /etc/ssh/sshd_config.d/10-moar-secure.conf
 	echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config.d/10-moar-secure.conf
 	echo "PasswordAuthentication no" >> /etc/ssh/sshd_config.d/10-moar-secure.conf
+
+	# restart service
+	service ssh restart
 }
 
 ConfigureApache() {
@@ -69,6 +72,22 @@ ConfigureApache() {
 	ln -s /etc/apache2/mods-available/ssl.conf /etc/apache2/mods-enabled/
 	ln -s /etc/apache2/mods-available/socache_shmcb.load /etc/apache2/mods-enabled/
 	ln -s /etc/apache2/mods-available/rewrite.load /etc/apache2/mods-enabled/
+
+	# restart service
+	apachectl restart
+}
+
+ConfigureMariaDB() {
+
+	# this particular setting, dropping STRICT_TRANS_TABLES mainly is to fight the
+	# war where exactly zero applications ever check that the data they want to store
+	# will even fit in the field they are storing it. this stops the "Data Too Long"
+	# errors.
+	echo "[mysqld]" > /etc/mysql/conf.d/10-sane-sql-mode.cnf
+	echo "sql-mode=\"NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION\"" >> /etc/mysql/conf.d/10-sane-sql-mode.cnf
+
+	# restart service
+	service mysql restart
 }
 
 InstallUserAccounts
@@ -77,3 +96,4 @@ InstallLAMP
 InstallOptDirectory
 ConfigureSSH
 ConfigureApache
+ConfigureMariaDB
