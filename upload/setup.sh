@@ -77,6 +77,11 @@ ConfigureApache() {
 	apachectl restart
 }
 
+ConfigurePHP() {
+	echo "[Date]" > /etc/php/8.0/apache2/conf.d/999-php.ini
+	echo "date.timezone = 'America/Chicago';" >> /etc/php/8.0/apache2/conf.d/999-php.ini
+}
+
 ConfigureMariaDB() {
 
 	# this particular setting, dropping STRICT_TRANS_TABLES mainly is to fight the
@@ -96,4 +101,5 @@ InstallLAMP
 InstallOptDirectory
 ConfigureSSH
 ConfigureApache
+ConfigurePHP
 ConfigureMariaDB
