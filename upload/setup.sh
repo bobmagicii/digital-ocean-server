@@ -13,6 +13,7 @@ InstallUserAccounts() {
 	cat setup/bashrc-append.txt >> /home/bob/.bashrc
 	cp setup/bash_aliases.txt .bash_aliases
 	cp setup/bash_aliases.txt /home/bob/.bash_aliases
+	chown -R bob.bob /home/bob/.bash_aliases
 
 	# add my sudo group override since users use keys.
 	echo "%sudo ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/10-sudo-group
