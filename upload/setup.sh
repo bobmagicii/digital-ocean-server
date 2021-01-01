@@ -18,6 +18,7 @@ InstallUserAccounts() {
 	echo "%sudo ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/10-sudo-group
 
 	# add my network key to the master control program
+	# requires you put an id_rsa and id_rsa.pub into setup/bob/sshkey.
 	if [-d "setup/bob/sshkey"] then
 		cp setup/bob/sshkey/* /home/bob/.ssh
 	fi
