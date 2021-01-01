@@ -22,6 +22,8 @@ InstallUserAccounts() {
 	# requires you put an id_rsa and id_rsa.pub into setup/bob/sshkey.
 	if [-d "setup/bob/sshkey"] then
 		cp setup/bob/sshkey/* /home/bob/.ssh
+		chown -R bob.bob /home/bob/.ssh/id_rsa
+		chmod 600 /home/bob/.ssh/id_rsa
 	fi
 }
 
