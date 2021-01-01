@@ -16,6 +16,11 @@ InstallUserAccounts() {
 
 	# add my sudo group override since users use keys.
 	echo "%sudo ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/10-sudo-group
+
+	# add my network key to the master control program
+	if [-d "setup/bob/sshkey"] then
+		cp setup/bob/sshkey/* /home/bob/.ssh
+	fi
 }
 
 InstallOptDirectory() {
@@ -36,7 +41,7 @@ InstallOptDirectory() {
 InstallCorePackages() {
 	# install things i need just to be productive.
 	apt-get update
-	apt-get -y install joe unzip mlocate
+	apt-get -y install joe unzip mlocate net-tools
 }
 
 InstallLAMP() {
