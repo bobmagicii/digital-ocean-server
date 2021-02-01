@@ -1,3 +1,5 @@
+#!/bin/bash
+
 set -e
 
 InstallUserAccounts() {
@@ -8,26 +10,22 @@ InstallUserAccounts() {
 	cp -r ~/.ssh /home/bob/
 	chown -R bob.bob /home/bob/.ssh
 
-	# add my bash configurations.
-	cat setup/bashrc-append.txt >> .bashrc
-	cat setup/bashrc-append.txt >> /home/bob/.bashrc
-	cp setup/bash_aliases.txt .bash_aliases
-	cp setup/bash_aliases.txt /home/bob/.bash_aliases
-	chown -R bob.bob /home/bob/.bash_aliases
-
 	# add my sudo group override since users use keys.
 	echo "%sudo ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/10-sudo-group
 
 	# add my network key to the master control program
 	# requires you put an id_rsa and id_rsa.pub into setup/bob/sshkey.
-	if [-d "setup/bob/sshkey"] then
+	if [ -d "setup/bob/sshkey" ]
+	then
 		cp setup/bob/sshkey/* /home/bob/.ssh
-		chown -R bob.bob /home/bob/.ssh/id_rsa
+		chown -R bob.bob /home/bob/.ssh
 		chmod 600 /home/bob/.ssh/id_rsa
 	fi
 }
 
 InstallOptDirectory() {
+	OWD=`pwd`
+
 	# where i keep the git repos.
 	mkdir /opt/git
 
@@ -38,6 +36,19 @@ InstallOptDirectory() {
 	# where i keep the web projects.
 	mkdir /opt/web-dev
 	mkdir /opt/web-prod
+
+	# mcp support things.
+	#git clone bob@mcp.techvip.net:/opt/git/mcp.git /opt/mcp
+	#cd /opt/mcp
+	#composer install
+
+	cd $OWD
+	echo "source /opt/mcp/usr/bashrc-aliases.sh" >> .bashrc
+	echo "source /opt/mcp/usr/bashrc-append.sh" >> .bashrc
+	echo "source /opt/mcp/data/bashrc/*.sh" >> .bashrc
+	echo "source /opt/mcp/usr/bashrc-aliases.sh" >> /home/bob/.bashrc
+	echo "source /opt/mcp/usr/bashrc-append.sh" >> /home/bob/.bashrc
+	echo "source /opt/mcp/data/bashrc/*.sh" >> /home/bob/.bashrc
 
 	chmod -R 777 /opt
 }
@@ -63,9 +74,15 @@ InstallLAMP() {
 }
 
 ConfigureSSH() {
+
+	# require keys.
 	echo "PermitRootLogin no" > /etc/ssh/sshd_config.d/10-moar-secure.conf
 	echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config.d/10-moar-secure.conf
 	echo "PasswordAuthentication no" >> /etc/ssh/sshd_config.d/10-moar-secure.conf
+
+	# make my magic management system work
+	echo "AuthorizedKeysFile /opt/mcp/usr/ssh-keys.txt /home/%u/.ssh/authorized_keys" >> /etc/ssh/sshd_config.d/10-moar-secure.conf
+	echo "StrictModes no" >> /etc/ssh/sshd_config.d/10-moar-secure.conf
 
 	# restart service
 	service ssh restart

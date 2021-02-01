@@ -1,3 +1,0 @@
-
-alias webdev="cd /opt/web-dev"
-alias webprod="cd /opt/web-prod"
